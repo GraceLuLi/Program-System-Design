@@ -1,0 +1,8 @@
+import java.awt.Point;
+
+public class Test {
+
+    Point testP=new Point(0,2);
+    testP= testP.setLocation(2,8);
+    System.out.println(testP);
+}

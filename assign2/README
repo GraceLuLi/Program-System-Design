@@ -1,0 +1,19 @@
+
+Name: Lu Li
+loginid: lli619
+
+command: create i 
+i=0, 1, ...9 ; create a new poly i
+
+command: print i 
+i=0, 1, ...9 ; print a  poly i
+
+command: eval i 
+i=0, 1, ...9 ; give value to poly i
+
+command: quit 
+get out of while loop
+
+command: help
+give command information 
+

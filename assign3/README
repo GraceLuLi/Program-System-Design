@@ -1,0 +1,8 @@
+/*
+name: Lu Li
+LoginID: lli619
+*/
+
+1.Create class BadDataException.java
+2.Add two addtional method in poly: polyIterator()and polyadd(Term)to make Iterator and add function for poly item
+3.All method runs well

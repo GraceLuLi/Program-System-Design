@@ -1,0 +1,47 @@
+// Name:
+// loginid:
+// CS 455 Lab 12
+// a program to test the linked list code necessary for a hash table chain
+
+#include <iostream>
+#include <string>
+#include <cassert>
+
+using namespace std;
+
+
+// this is the same Node type and ListType from PA5 Table.cpp
+struct Node {
+  string key;
+  int value;
+
+  Node *next;
+
+  Node(const string &theKey, int theValue);
+
+  Node(const string &theKey, int theValue, Node *n);
+};
+
+Node::Node(const string &theKey, int theValue) {
+  key = theKey;
+  value = theValue;
+  next = NULL;
+}
+
+Node::Node(const string &theKey, int theValue, Node *n) {
+  key = theKey;
+  value = theValue;
+  next = n;
+}
+
+
+typedef Node * ListType;
+
+
+int main() {
+
+
+
+
+  return 0;
+}

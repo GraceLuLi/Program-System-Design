@@ -1,0 +1,60 @@
+.mapTable = mapTable;
+     this.debug = debug;
+     this.random = random;
+     outTextArr = new ArrayList<String>();
+   }
+       
+   public ArrayList<String> textGenerate(int numWords)
+   {
+	   ArrayList<String> outTextArr = new ArrayList<String>();
+	   int firstPrefixIndex = random.nextInt(mapTable.size());
+	   Set<Prefix> prefixSet = mapTable.keySet();
+	   Iterator<Prefix> iter = prefixSet.iterator();
+	   Prefix firstPrefix = new Prefix(); 
+	   int i = 0;
+	   while (iter.hasNext() & i<=firstPrefixIndex)//any improve????
+	      {
+		    firstPrefix = iter.next();
+		    i++;
+	      } 
+	  if(numWords <= 0)
+	  {
+		  return outTextArr;
+	  }
+	  else
+	  {
+	  ArrayList<String> successors = mapTable.get(firstPrefix);
+	  int firstSuccessorIndex = random.nextInt(successors.size());
+	  String successor = successors.get(firstSuccessorIndex);
+	  outTextArr.add(successor);
+	  if(numWords > 1)
+	  {
+		  Prefix prefix = firstPrefix;
+		  for(int j=0; j<numWords-1;j++)
+		  {
+		    prefix.shiftOut();
+		    prefix.shiftIn(successor);
+		    successors = mapTable.get(prefix);
+		    successor = successors.get(random.nextInt(successors.size()));
+		    outTextArr.add(successor); 
+		  }
+	  }
+      return outTextArr;
+	  }
+	  
+   }
+   
+   
+   
+   
+// **************************************************************
+    //  PRIVATE INSTANCE VARIABLE(S)
+   private Map<Prefix, ArrayList<String>> mapTable;
+   private boolean debug; 
+   private Random random;
+   private ArrayList<String> outTextArr;
+ 
+     
+}
+
+

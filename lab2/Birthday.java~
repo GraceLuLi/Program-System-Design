@@ -1,0 +1,25 @@
+import java.util.Calendar;
+import java.util.Scanner;
+
+public class Birthday {
+    public static void main(String[] args) {
+
+         Scanner in = new Scanner(System.in);
+         Calendar cal=Calendar.getInstance();
+         Date todaydate=cal.getTime();
+
+    	 System.out.print("Enter your birth month: ");
+	 String birthmonth = in.nextInt();
+
+	 System.out.print("Enter your birth day of month: ");
+	 int birthday = in.nextInt();
+
+         year=cal.get(Calendar.YEAR);
+	     cal.set(year,birthmonth,birthday);
+	     Date birthdate=cal.getTime();
+	     k=birthdate-todaydate;
+
+ 	 System.out.println("Your birthday is only" + k + "days away!");
+	 
+    }
+}

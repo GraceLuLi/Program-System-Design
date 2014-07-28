@@ -1,0 +1,35 @@
+import java.util.Calendar;
+import java.util.Scanner;
+import java.util.Date;
+
+
+public class test {
+    public static void main(String[] args) {
+	Calendar today=Calendar.getInstance();
+
+     Scanner in = new Scanner(System.in);
+     int  year = today.get(Calendar.YEAR);
+     System.out.println(year);
+
+     	System.out.print("Please enter your birthmonth: ");
+	int  birmonth = in.nextInt();
+
+	System.out.print("Please enter your birthday: ");
+	int  birday = in.nextInt();
+	Calendar birthday = today;
+   
+        birthday.set(Calendar.YEAR,year);
+        birthday.set(Calendar.MONTH,birmonth);
+        birthday.set(Calendar.DATE,birday);
+
+
+        long  t=today.getTimeInMillis();
+        long  b=birthday.getTimeInMillis();
+      
+        long  k1=t-b;          
+        long  k2=k1/(1000*60*60*24);
+	System.out.println("Your birthday is only " + k2 + "days away!");
+
+ 
+    }
+}

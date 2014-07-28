@@ -1,0 +1,785 @@
+<!DOCTYPE html PUBLIC "-//w3c//dtd html 4.0 transitional//en"><html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en]C-CCK-MCD   (WinNT; I) [Netscape]">
+
+<title>PA3 CS 455</title></head>
+
+
+<body bgcolor="#d0d0d0">
+
+<center>
+<h2>
+CS 455 Programming Assignment 3</h2></center>
+
+<div align="right">Spring 2012 [Bono]
+<br>
+<strong>Due date:</strong> Wednesday, Mar. 21, 11:59pm
+</div>
+
+<hr>
+
+<a name="intro"><h3>Introduction</h3></a>
+
+In this assignment you will get practice using the Java
+<kbd>LinkedList</kbd> class, and practice using the Java exception
+mechanism.  The assignment involves enhancements to your last
+assignment.  There are three main types of enhancement: (1) you'll
+reimplement your Poly class to use a LinkedList instead of an
+ArrayList, (2) you'll add some new functionality (methods) to the Poly
+class (one of which would be less efficient if we had used an
+ArrayList); and (3) you'll make your PolyProg more bullet-proof.  Item
+(2) will also involve changes to your PolyProg so users can use the
+new operations available on Poly objects.
+<p>
+Because this links back to your PA2 assignment description in several
+places and has many section names that are the same, to help you not
+get confused about which document you are viewing, we preceded many of
+these common section names with the string (PA3) in this document and
+changed the background color of this assignment.
+<p>
+
+<a name="resources"><h3>Resources</h3> 
+
+<ul>
+
+<li> Horstmann, Ch. 11 Exceptions
+
+<li> <a
+href="http://download.oracle.com/javase/1.5.0/docs/api/java/util/Scanner.html">Java
+Scanner documentation</a>.  Describes exceptions thrown from Scanner
+methods.
+
+<li> Horstmann, Section 15.1 Using Linked Lists
+
+<li> <a
+href="http://download.oracle.com/javase/1.5.0/docs/api/java/util/LinkedList.html">Java
+LinkedList documentation</a> 
+<li> <a
+href="http://download.oracle.com/javase/1.5.0/docs/api/java/util/ListIterator.html">Java ListIterator documentation</a>
+
+</ul>
+
+<a name="files"><h3>The assignment files</h3> 
+</a>
+
+<strong>Getting the assignment files.</strong> 
+Make a pa3 directory and copy all of the source code files from
+<kbd>~csci455/assgts/pa3</kbd> to that directory (i.e., all the .java files).
+
+<p>
+
+The files in <strong><tt>bold</tt></strong></a> below are ones you
+ create and/or modify and submit.  The ones not in bold are ones that
+ you will use, but not modify.  The files are:
+
+<ul>
+
+<li><a href="Poly.java"><strong><kbd>Poly.java</kbd></strong></a> The
+<a href="#interface">interface</a> for the <kbd>Poly</kbd> class; it
+contains stub versions of the functions so it will compile.  You will
+be completing the <a href="#impl">implementation</a> of this class.
+You may not change the interface to the existing methods for this
+class, but you may add private instance variables and/or private
+methods to it.  You may also add public methods to be used for
+debugging/development purposes only, such as <kbd>toString</kbd> (more
+about that in Section 10.7.1 of the textbook) or one to create a
+hard-code poly (more <a href="#devel">here</a>).
+
+<li><a href="Term.java"><kbd>Term.java</kbd></a> Code for a class for
+a single term in a polynomial.  Same exact code as for PA2.
+p
+<li><strong><kbd>PolyTester.java</kbd></strong> A non-interactive test
+program for your <kbd>Poly</kbd> class.  You will want to add new
+tests to it in addition to what you had for PA2.  You are not required
+to submit this file.
+
+<li><strong><kbd>PolyProg.java</kbd></strong> The command-based
+program that lets you manipulate polynomials.  It has all of the
+commands of the old version, plus some new ones, and some new 
+<a href="#error">error handling</a>.
+Its behavior is specified <a href="#prog">later</a> in the
+assignment.  You probably will want to use <em>a copy of</em> the one
+you submitted for PA2 as a starting point for your code.
+
+<li><strong><kbd>README</kbd></strong> See
+section on <a href="#submit">Submitting your program</a> for what to
+put in it.  You create this file.
+
+</ul>
+
+<a name="run"><h3>Note on running your program</h3>
+
+As with PA2, we will be using <kbd>assert</kbd> statements in this
+program.  To be able to use them, you need to run the program with
+asserts enabled (-ea flag).  (You do not need to compile any special
+way.)  Here are two examples:
+
+<pre>
+java -ea PolyTester
+java -ea PolyProg
+</pre>
+
+You should run with this flag set every time.
+<p>
+
+<a name="assgt"><h3>The assignment</h3>
+</a>
+
+The overview of the changes to PA2 for this assignment were already given
+in the <a href="#intro">introduction</a>.  The detailed explanation of
+those changes, as well as a few other more minor ones, are described
+in detail in the following sections of the document, and then
+summarized <a href="#summary">near the end</a> of the document.
+<p>
+
+<a name="interface"><h3>(PA3) Poly: interface</h3>
+
+We have repeated the part of the interface you implemented for PA2
+here for your convenience.  The methods new to PA3 are shown with a *
+next to them.
+<p>
+
+<dl>
+
+<dt>
+<kbd><strong>Poly p = new Poly();</kbd></strong>
+<dd>
+Create the zero polynomial.  That is one all of whose coefficients have
+the value zero.
+<p>
+
+<dt>
+<kbd><strong>Poly p = new Poly(new Term(3,5));</kbd></strong>
+<dd>
+Create a polynomial with a single term.  For example, the above
+expression creates the polynomial <kbd>3x<sup>5</sup></kbd>.
+<p>
+
+
+<dt>
+<kbd><strong>* Poly poly2 = new Poly(poly1);</kbd></strong>
+<dd>
+
+Makes a copy of a polynomial.  The statement above makes poly2 refer
+to the copy of poly1.  Such a constructor is called a copy
+constructor, and we'll refer to it as such in this document.  After
+calling the copy constructor, changes to poly1 do not affect poly2 and
+vice versa.
+
+
+<pre>
+poly1: 3x<sup>3</sup> + 2x + 7
+poly2: 3x<sup>3</sup> + 2x + 7
+</pre>
+<p>
+
+
+<dt>
+<kbd><strong>Poly sum = poly1.add(poly2);</kbd></strong>
+<dd>
+Add two polynomials, resulting in a new one that is the sum of the first two.
+The two original polynomials are unchanged.
+<pre>
+poly1: 3x<sup>3</sup> + 2x + 7
+poly2: x<sup>5</sup> -3x<sup>3</sup> + 5
+sum:   x<sup>5</sup> + 2x + 12
+</pre>
+<p>
+
+<dt>
+<kbd><strong>double result = poly1.eval(x);</kbd></strong>
+<dd>
+Evaluate a polynomial for a specific floating point value of x.
+<pre>
+poly1: 3x<sup>3</sup> + 2x + 7
+x: 2
+result: 35
+</pre>
+<p>
+
+<dt>
+<kbd><strong>System.out.println(poly1.toFormattedString());</kbd></strong>
+
+<dd> Return a String version of the polynomial that's close to the
+usual format we use to denote polynomials.  It's "close to", because
+it's not going to use a superscript to denote exponentiation.  Here's
+the format to use: <pre>3x^2 + 2x + 7.0</pre>
+
+For the zero polynomial print <kbd>0.0</kbd>.
+
+Note that to make the coding easier a <kbd>double</kbd> that has no
+decimal part is printed as, for example, "3.0" instead of "3"; that's
+the default format used in Java when converting such a <kbd>double</kbd> to
+a <kbd>String</kbd>.  
+<p>
+
+<dt>
+<kbd><strong>* poly1.addIn(poly2);</kbd></strong>
+<dd>
+Add a polynomial to an existing polynomial.  poly2 is unchanged.
+This is the only Poly mutator: the implicit parameter changes as a 
+result of this operation.
+
+<pre>
+poly1 before: 3x<sup>3</sup> + 2x + 7
+poly2: x<sup>5</sup> -3x<sup>3</sup> + 5
+poly1 after:   x<sup>5</sup> + 2x + 12
+</pre>
+<p>
+
+
+<dt>
+<kbd><strong>* Poly product = poly1.mult(poly2);</kbd></strong>
+<dd>
+
+Multiply two polynomials, resulting in a new one that is the product of
+the first two.  The two original polynomials are unchanged.
+
+<pre>
+poly1: 3x<sup>3</sup> + 2.0x + 7
+poly2: x<sup>5</sup> - 3x<sup>3</sup> + 5
+product: 3x<sup>8</sup> - 7x<sup>6</sup> + 7x<sup>5</sup> - 6x<sup>4</sup> - 6x<sup>3</sup> + 10x + 35
+</pre>
+<p>
+
+
+</dl>
+
+As before, no <kbd>Poly</kbd> functions should do any I/O.
+<p>
+
+<a name="impl"><h3>(PA3) Poly: representation/implementation</h3>
+
+We are using the same basic sparse representation as we did in PA2, it
+will just be in a LinkedList here instead of an ArrayList.  So, like
+before we are only explicitly representing non-zero terms, and keeping
+them in decreasing order by exponent.  Please see <a
+href="../pa2/pa2.html#impl">PA2</a> for more information about the
+sparse representation.
+
+<p>
+
+
+<a name="add"><h4>(PA3) More on adding two polynomials</h4>
+
+In PA3 we have <em>two</em> different functions for adding two
+polynomials.  You could maintain two versions of code for adding
+two polynomials, but a better option is to write the <kbd>addIn</kbd>
+(+=) method first (which now operates on LinkedLists), and then
+implement <kbd>add</kbd> in terms of the copy constructor and
+<kbd>addIn</kbd>.  Hint: the <kbd>add</kbd> method will
+be very short.
+<p>
+Your <kbd>addIn</kbd> function is required to take O(<em>m</em> +
+<em>n</em>), where <em>m</em> is the length of the first poly, and
+<em>n</em> is the length of the second poly, just like <kbd>add</kbd>
+in PA2.  It will use the same merge algorithm as before, but the code
+won't be exactly the same as before, because it will be modifying the
+list in the first poly, rather than creating a new poly from scratch.
+<p>
+<kbd>add</kbd> is still required to also be O(m + n), which will be
+true if you implement it in terms of the O(m + n) <kbd>addIn</kbd>.
+<p>
+Please take special care to make sure that the case <kbd>a.addIn(a)</kbd>
+works correctly (and definitely test that case).
+<p>
+For more information on merging two ordered lists please see <a
+href="../pa2/pa2.html#add">the corresponding section in PA2</a>.
+<p>
+<a name="add2"><h4>Additional requirement on adding two polynomials</h4>
+
+New to PA3, you must optimize the case where the right operand (i.e.,
+explicit parameter) of the <kbd>addin</kbd> has
+exponents that are all smaller than the smallest one in the left
+operand (i.e., the implicit parameter).  For ease in discussing it further,
+assume the following call:
+
+<pre>
+p1.addIn(p2);
+</pre>
+
+The optimization is that this case has to run in O(<em>n</em>)
+(<em>n</em> is size of p2), rather than O(<em>m</em> + <em>n</em>).  This
+implies you cannot traverse <kbd>p1</kbd> for that case.  There are
+LinkedList operations to support this.  In particular you can access
+the last element in a linked list in constant time (unfortunately the
+Java LinkedList documentation is not very clear on the time complexity of
+its various methods).
+<p>
+Why is this optimization useful?  There are two situations here where
+it comes up:
+
+<ol>
+
+<li> Consider the PolyProg <kbd>create</kbd> operation.  Suppose the
+list of terms a user gives for creating a polynomial is already in
+decreasing order by exponent (which is somewhat likely).  E.g., Their
+data for the create command is as follows.
+
+<pre>
+3 4 100 2 25 0
+</pre>
+
+Note: You will only be able to take advantage of this optimization in
+your program if you also change the implementation of the PolyProg
+create command to use <kbd>addIn</kbd> instead of add.  (<kbd>add</kbd> always involves copying the first list, an O(m) operation.)
+
+<p>
+<li> If you want to use <kbd>addIn</kbd> to help you implement <kbd>mult</kbd>
+(more on that in the next sub-section), there are some cases where the
+second operand will have one or more terms, all of which are smaller
+than the first operand.  This will save you from a bunch of
+unnecessary traversals in those cases.
+
+</ol>
+
+<strong>Question 1:</strong> Suppose a PolyProg user does the
+<kbd>create</kbd> command to create a polynomial with <em>n</em>
+terms, such that he/she enters them in decreasing order by exponent (a
+small, <em>n</em>=3, example of this was shown in item 1 above).  In
+big-O terms, how long will it take to create the <em>n</em>-term
+polynomial, using your optimized version of <kbd>addIn</kbd>?  <p>
+
+<strong>Question 2:</strong> Same question, but assuming the
+user didn't enter the terms in any particular order?
+<p>
+Put the answers to these questions in your README file.
+
+<a name="mult"><h4>More on multiplying polynomials</h4>
+
+Your mult routine is definitely allowed to be O(<em>m</em> *
+<em>n</em>), since that's how many terms need to be multiplied
+together pairwise.  It will probably be easier to write the code if
+your <kbd>mult</kbd> method uses <kbd>add</kbd> or <kbd>addIn</kbd>.
+
+<a name="copy"><h4>More on copy constructor for polynomials</h4>
+
+We didn't need a copy constructor for PA2, because the Poly class
+there was immutable, which is no longer the case for PA3.
+Normally a copy constructor would do a "deep" copy, such that all
+sub-parts, and sub-parts of sub-parts also get copied.  However,
+since <kbd>Term</kbd>s are immutable, they do not need to be copied by
+your copy constructor.  Hint: this method will be <em>very</em> short.
+
+<a name="invar"><h3>(PA3) Implementation invariants and isValidPoly</h3>
+
+The <kbd>isValidPoly</kbd> method and its use in <kbd>assert</kbd>
+statements is still required in PA3, as well as an implementation
+invariant comment (the latter is part of our published style
+guidelines).
+<p>
+Since your representation is very similar to last time, your
+implementation invariant won't be very different, and your
+<kbd>isValidPoly</kbd> method will be checking the same basic things,
+although the code is not identical, since we're using a different data
+structure.
+<p>
+New to PA3 the Poly class has a mutator, <kbd>addIn</kbd>, so you'll
+need to call <kbd>isValidPoly</kbd> in an assert statement on the
+implicit parameter at the end of that method too, as well as for the
+Poly objects created by the copy constructor and <kbd>mult</kbd> in those
+methods.
+<p>
+
+
+<a name="test"><h3>(PA3) PolyTester program</h3>
+
+<p>
+
+You should be able to reuse your PolyTester code from PA2, although
+you'll need to add tests of the new Poly methods we're adding for this
+assignment.
+<p>
+
+Besides the usual stuff, some particular test cases you'll want to
+make sure to include: ones that use the optimized part of
+<kbd>add</kbd> / <kbd>addIn</kbd>, ones that check that your copy
+constructor actually makes a copy of the object (i.e., changing one
+copy doesn't have an effect on the other), and tests of adding a poly
+to itself (using addIn).
+
+<p>
+
+<a name="prog"><h3>(PA3) Poly program</h3>
+
+Like in the last assignment, we're going to show you the user
+interface by example.  To keep the example shorter, it just
+demonstrates the new commands: <kbd>addin</kbd>, <kbd>mult</kbd>, and
+<kbd>copy</kbd>, corresponding to the three new Poly methods.  For
+more complete information about the startup actions of the program,
+and the arguments and output for the commands carried over from PA2,
+you should look at <a href="../pa2/pa2.html#prog">that programming
+assignment</a>: their interface hasn't changed for correct cases,
+although they may result in different output in PA3 when they are
+given invalid input by the user, because of our more robust error
+processing (to be described further soon).
+<p>
+Like the similar example in PA2, this one shows a few of the input
+error conditions and associated error messages, but not all of them.
+See the next <a href="#error">section</a> for details of error
+checking.
+<p>
+Again, your error messages, beginning message, and help output do not
+have to match the output here character-by-character, although all the
+other output must match what you see here.
+<p>
+User input
+shown in bold below.  
+The explanatory text in italics and parentheses
+is not part of the actual user interaction.
+<p>
+
+<pre>
+cmd&gt; <strong>create 0</strong>
+Enter a space-separated sequence of coeff-power pairs terminated by &lt;nl&gt;
+<strong>1 100 3 0</strong>
+cmd&gt; <strong>print 0</strong>
+x^100 + 3.0
+cmd&gt; <strong>create 1</strong>
+Enter a space-separated sequence of coeff-power pairs terminated by &lt;nl&gt;
+<strong>1 2 2 1 1 0</strong>           <em>(can use repeated calls to addIn)</em>
+cmd&gt; <strong>print 1</strong>
+x^2 + 2.0x + 1.0
+cmd&gt; <strong>addin 1 0 2</strong>
+ERROR: too many arguments.  Expecting 2.
+For more information type 'help'
+cmd&gt; <strong>addin 1 0</strong>        <em>(poly 1 += poly 0)</em>
+cmd&gt; <strong>print 0</strong>
+x^100 + 3.0
+cmd&gt; <strong>print 1</strong>
+x^100 + x^2 + 2.0x + 4.0
+cmd&gt; <strong>copy 0 3</strong>        <em>(poly 0 = poly 3)</em>
+cmd&gt; <strong>print 0</strong>
+0.0
+cmd&gt; <strong>copy 2 1</strong>        <em>(poly 2 = poly 1)</em>
+cmd&gt; <strong>print 2</strong>
+x^100 + x^2 + 2.0x + 4.0
+cmd&gt; <strong>mult 2 0 1</strong>      <em>(poly 2 = poly 0 * poly 1)</em>
+cmd&gt; <strong>print 2</strong>
+0.0
+cmd&gt; <strong>create 3</strong>
+Enter a space-separated sequence of coeff-power pairs terminated by &lt;nl&gt;</em>
+<strong>3 o 1 1</strong>
+ERROR: wrong input type.  A term is a coefficient (double)
+       followed by an exponent (int).
+Enter a space-separated sequence of coeff-power pairs terminated by &lt;nl&gt;</em>
+<strong>3 0 1 1</strong>                 <em>(ok to enter terms in any order)</em>
+cmd&gt; <strong>create 4</strong>
+Enter a space-separated sequence of coeff-power pairs terminated by &lt;nl&gt;</em>
+<strong>-3 0 1 1</strong>
+cmd&gt; <strong>print 3</strong>
+x + 3.0
+cmd&gt; <strong>print 4</strong>
+x + -3.0
+cmd&gt; <strong>mult 4 3 4</strong>      <em>(poly 4 = poly 3 * poly 4)</em>
+cmd&gt; <strong>PriNt 4</strong>         <em>(commands can be upper or lower case)</em>
+x^2 + -9
+cmd&gt; <strong>quit</strong>
+</pre>
+<p>
+
+<a name="error"><h3>(PA3) Error checking required</h3>
+
+As mentioned earlier, you're going to make your program bullet-proof,
+i.e., your program will handle any invalid input given by the user.
+<p>
+Here is a list of errors your poly program must check for:  
+
+<ul>
+<li> invalid command
+
+<li> For the arguments to the commands (i.e., polynomial id numbers)
+
+<ul>
+
+<li> illegal polynomial index
+
+<li> wrong type of input (e.g., "3.4" or "foo")
+
+<li> too few arguments
+
+<li> too many arguments
+
+</ul>
+
+<li> for the polynomial data for the <kbd>create</kbd> command:
+
+<ul>
+  <li> wrong type of input (doubles are supposed to alternate with
+  int.  The following input sequence <em>is</em> valid: "3 4")
+
+  <li> negative exponent
+
+  <li>missing the last exponent (i.e., odd number of values).
+  For this you should ignore the last value entered (i.e., the term that
+  had a coefficient given with no corresponding exponent).
+
+  </ul> 
+</ul>
+
+Like before, all error messages should start with the string "ERROR:"
+(with one exception we'll describe soon).  Then you should provide an
+informative message, which either would briefly describe what correct
+input was expected, or refer the user to the help option (and the help
+option would explain what was expected).
+<p>
+For all of the errors related to the command line (i.e., in response
+to <kbd>"cmd>"</kbd> prompt), once you report the error (as described
+above), you ignore the command, and return to the command prompt.
+There is an example of this shown in the previous section.
+<p>
+For all of the errors related to the polynomial data entered for the
+<kbd>create</kbd> command, except for the last one mentioned, once you
+report the error, you ignore the data entered, and return to the
+prompt for entering polynomial data (i.e., "Enter a
+space-separated...").  Your error messages here should not refer
+the user to the help option, since they wouldn't be able to use it at
+that point.  There is an example of this shown in the previous section.
+<p>
+The last error mentioned above, missing the last exponent, is a
+special case.  Because you are recovering from the bad input, in that
+case you do actually carry out the command, so you don't prompt
+for a new list of terms.  For this one only print WARNING instead
+of ERROR, and briefly describe the corrective action being taken.
+
+<a name="exceptions"><h3>(PA3) Error processing and exceptions</h3>
+
+The exception mechanism will be helpful for doing the error processing
+required for this assignment.  In particular the following tips may be helpful:
+
+<ul>
+<li> familiarize yourself with the exceptions that the
+<kbd>Scanner</kbd> methods can throw.  There's a link to Scanner
+documentation in the <a href="#resources">resources</a> section near
+the beginning of this document.
+<p>
+
+<li> you may or may not have done this for pa2, but to process errors
+related to wrong numbers of arguments for the commands, you will need
+to assume all the arguments will be entered on the same line; i.e., use
+the newline as a delimiter for the command plus its arguments.  You saw
+how to process values in a single line in lab 5 and pa2.
+<p>
+
+<li> also, especially since our error processing is now more
+sophisticated, and to avoid repeated code for processing command line
+arguments, you may want to have a special method to process and
+return command-line arguments.  It would return the list of arguments
+each in <kbd>int</kbd> form if the arguments are all <a
+href="http://www.merriam-webster.com/dictionary/hunky-dory">hunky-dory</a>,
+or throw an exception if they aren't.  E.g., it might have a header
+such as the following (some details left out):
+
+<pre>
+private static int[] getCommandArgs(..., int numArgs) throws ...
+</pre>
+<p>
+
+<li> then you can catch the exception(s) thrown above several levels
+away from where the error was detected.  E.g., in your <kbd>main</kbd>
+that has the main loop for the program.
+<p>
+
+<li> likewise for processing the the polynomial data for the create command:
+If you don't have one already, you probably want to add a static
+method for parsing that data (similar to getCommandArgs, described
+above).  It won't be convenient to return an array since we don't know
+ahead of time how many arguments there will be, but it could return an
+ArrayList&lt;Term&gt; or the Poly itself.  (The first one means an ArrayList
+of the terms the user entered, which is distinct from what would be in a
+Poly created from this data.)
+<p>
+
+<li> it may be useful to create your own exception type.  Furthermore,
+you may want to turn Scanner exceptions into that new type to have
+uniform error message reporting format for most or all of your exceptions.  To
+turn one exception into another: in a <kbd>catch</kbd> for one
+exception, you just <kbd>throw</kbd> a different exception.  There is
+an example of code to create your own exception type in the case study
+developed in section 11.8 of the text.
+<p>
+
+
+</ul>
+
+We recommend you implement and test the error processing required for
+this assignment separately from testing the new features of the
+<kbd>Poly</kbd> class.  More about this in the <a
+href="#devel">Program development hints</a> section.
+
+
+<a name="lineinput"><h3>Reading polynomial data for <kbd>create</kbd>
+command</h3>
+
+This part has not changed, except for the error processing mentioned
+<a href="#error">above</a>.  For more information about it, see the <a
+href="../pa2/pa2.html#lineinput">corresponding section</a> in the PA2
+assignment.
+<p>
+
+<a name="devel"><h3>(PA3) Program development hints</h3>
+
+As usual, we recommend using incremental development.  The
+<kbd>Poly</kbd> class implementation and the error processing required
+in <kbd>PolyProg</kbd> are somewhat independent, so you could develop
+either of these before doing the other.
+<p>
+In particular, you could add all of the error-checking features to
+your PA2 version of <kbd>PolyProg</kbd> and test them, before you even
+start with the changes to Poly, or the new PolyProg commands.  This
+might involve some restructuring (so-called refactoring) of the code
+and methods of PolyProg to avoid repeating code unnecessarily.  Once
+that was done, you could then redo and test Poly with an updated
+PolyTester, and finally, add the new commands to PolyProg.
+<p>
+Or, alternatively, you could modify the implementation of your Poly
+class first, adding the new methods too, and then test them completely with
+a modified PolyTester program, and with your PolyProg from PA2.  The
+PolyProg from PA2 and your old PolyTester tests make up a form of a
+regression test on the Poly class.  I.e., you want the output for your
+new Poly class to give the exact same output as your old Poly class
+did on the PA2 tests (i.e., assuming your old Poly class worked
+correctly).
+<p>
+
+Another option is to just reimplement the PA2 poly as a
+LinkedList first, before adding any other functionality; this is not a
+bad idea, making it very easy to do regressing tests with your two PA2
+test programs.  However, it would involve later (in refactoring) throwing away some
+of the code you wrote: the recommended way to implement <kbd>add</kbd>
+and <kbd>addIn</kbd> to get the most code-reuse (i.e., have less code
+to implement) involved writing the <kbd>add</kbd> method that calls
+<kbd>addIn</kbd>
+(see <a href="#add">here</a> for more information).
+
+<p>
+
+Like in PA2, within the implementation of the Poly class, you can play
+tricks to aid with incremental development there.  
+Suppose you'd like to try writing code to iterate through a list,
+(e.g., by writing toFormattedString), before doing fancier stuff such
+as merging two lists (like in <kbd>addIn</kbd>).  Here are some suggestions:
+<p>
+<ul>
+<li>
+One way to achieve this would be to add a public method to load in a
+bunch of hard-coded data into a Poly, similar to the
+<kbd>loadNames</kbd> method that was in the <a
+href="http://www-scf.usc.edu/~csci455/curr/lectures/code/02-07/complete/Names.java"><kbd>Names</kbd>
+class</a> we discussed in lecture a while ago.
+<p>
+
+<li>
+Another way to do it would be to write an initial version of <kbd>addIn</kbd>
+ that only works correctly if the largest exponent of the second Poly
+ is smaller than all the ones in the first poly.  Then you test this
+ temporary version of <kbd>addIn</kbd> on cases where that is true, so you
+ can build a Poly easily on which to try out toFormattedString.  E.g.
+
+<pre>
+Poly p = new Poly();
+for (int exp = 5; exp >= 0; exp-=1) {
+   p.addIn(new Term(exp+1, exp));
+}
+System.out.println(p.toFormattedString());
+</pre>
+
+The above test is just one example, by itself it doesn't test all the
+features of toFormattedString.
+<p>
+</ul>  
+
+<a name="summary"><h3>(PA3) Summary of requirements</h3>
+
+As on the first assignment, there are several requirements for this
+assignment related to design, testing, and development process strewn
+throughout this document.  We'll summarize those and the functional
+requirements here:
+
+<ul>
+
+<li> implement Poly class according it's public interface.  In
+addition to the methods from PA2, this now includes three new methods,
+<kbd>addIn</kbd>, the copy constructor, and <kbd>mult</kbd> (see <a
+href="#interface">Poly: interface</a>)
+
+<li> use the LinkedList representation for Poly described in the
+<a href="#impl">section</a> about that.
+
+<li> the <kbd>Poly add</kbd> and <kbd>addIn</kbd> methods can't run in
+more than O(m+n) time as described in the section on <a
+href="#add">adding two polynomials</a>.  (Same requirement as on PA2.)
+
+<li> the two Poly add functions must run in O(n) time for the special case
+described in <a href="#add2">this section</a>.
+
+<li> implement and use private Poly method <kbd>isValidPoly</kbd> as described 
+in PA2 <a href="../pa2/pa2.html#valid">here</a>.  (Same requirement as on PA2.)
+
+<li> augment your PolyProg from PA2 so that it now supports some
+additional commands corresponding to the new Poly methods, and has
+improved error processing.  More about the user interface in the
+section on the <a href="#prog">Poly program</a>.
+
+<li> make the PolyProg interface bullet-proof.  More about this in the
+section on <a href="#error">error checking</a>.
+
+<li> this program will also be evaluated on style and documentation.
+The style guidelines for the course are linked from the Programming
+Assignments page for CS 455, and <a href="../style.html">here</a>.
+
+<li> create a README file, as described below.
+</ul>
+
+
+<a name="submit"><h3>(PA3) README file / Submitting your program</h3>
+
+You will be submitting <kbd>Poly.java</kbd>,
+<kbd>PolyProg.java</kbd>, and
+<kbd>README</kbd>.  Optionally, you will also be submitting one or
+more files for any additional classes you created.  For example, if
+you added your own exception class, as described <a
+href="#exceptions">here</a>.  If you do add your own classes in separate
+files, please document that in the README, and make sure you add them
+as arguments to the submit command you use (more about that below).
+Make sure your name and loginid appear at the
+start of each file.
+<p>
+Here's a review of what goes in the README:  This is the place to
+document known bugs in your program. That means you should describe
+thoroughly any test cases that fail for the the program you are
+submitting.  You can also use the README to give the grader any other
+special information, such as if there is some special way to compile
+or run your program.  In addition don't forget put in your answer to 
+the README questions given in <a href="#add2">this section</a>.
+<p>
+Like last time, for your convenience we put the exact submit command
+to use in a shell script.
+Type:
+
+<pre>
+~csci455/assgts/pa3/turninpa3
+</pre>
+
+to submit the program.  (It's just a text file, so you can look at
+its <a href="turninpa3">contents</a> to see the submit command it will run.)
+<p>
+
+If you have additional files to submit (e.g., if you added your own
+exception class), you'll need to edit a local copy of the
+<kbd>turninpa3</kbd> file.  Using the following command to copy it
+will keep the execute permission from the original version of the
+file:
+
+<pre>
+cp -p ~csci455/assgts/pa3/turninpa3 .
+</pre>
+
+
+
+(If you are interested, you can learn more about Unix file permissions in
+the <a href="http://www.usc.edu/its/unix/commands/permissions.html">ITS documentation.</a>)
+<p>
+<hr>
+</body>
+</html>

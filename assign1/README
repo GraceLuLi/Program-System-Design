@@ -1,0 +1,7 @@
+1.Because the program takes each step by random, so it could  go back, which 
+form the dead ends.
+
+2. When iconify window,the path changes.The reason is that the grahic is redrawn, it takes another random path.
+
+3.A possible solution is that set a variable to keep the component, such that 
+each time redrawn the windom, the graphics output keep same, only after another command of 'java RandomWalkViewer', it changes.

@@ -1,0 +1,4 @@
+#
+# Unix command to submit pa3
+#
+submit -user csci455 -tag pa3 Poly.java PolyProg.java README

@@ -1,0 +1,17 @@
+import java.util.Scanner;
+
+
+
+public class Drunkard {
+
+    System.out.println("Please type in step size:");
+    Scanner in = new Scanner(System.in);
+    int k= in.nextInt();
+    Drunkard person1=new Drunkard(initail,k);
+         Point P1 = new Point(0,0);
+         Point P2 = new Point(0,0);
+         P1 = person.getCurrentLoc();
+	 person.takeStep();
+         P2 = person.getCurrentLoc();
+    System.out.println("The step size between "+P1+" and "+P2+" is "+k);
+}

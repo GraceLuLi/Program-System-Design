@@ -1,0 +1,94 @@
+/**
+   A cash register totals up sales and computes change due.
+
+   Version for CS 455 lab 3.  Modified from version from Big Java, 4th ed.
+
+   Changes:
+
+     Added getTotal() accessor function.
+     Made constants private.
+
+   Ex:
+   CashReg register = new CashReg();
+   register.recordPurchase(0.59);  // ring something up
+   register.recordPurchase(1.99);  // ring up another item
+   register.recordPurchase(5.0);   // ring up a third item
+   int tot = register.getTotal();    // total of purchases so far: 7.58
+   register.enterPayment(10,0,0,0,0);  // customer pays with a 10
+   int change = register.giveChange();  // compute change owed: 2.42
+                                        // and zeroes out register
+
+   register.recordPurchase(1.0);  // now we can record someone else's stuff...
+
+*/
+public class CashReg
+{
+   private static final double QUARTER_VALUE = 0.25;
+   private static final double DIME_VALUE = 0.1;
+   private static final double NICKEL_VALUE = 0.05;
+   private static final double PENNY_VALUE = 0.01;
+
+   private double purchase;
+   private double payment;
+
+   /**
+      Constructs a cash register with no money in it.
+   */
+   public CashReg()
+   {
+      purchase = 0;
+      payment = 0;
+   }
+
+   /**
+      Records the purchase price of an item.
+      @param amount the price of the purchased item
+   */
+   public void recordPurchase(double amount)
+   {
+      purchase = purchase + amount;
+   }
+   
+   /**
+      Gets total of all purchases made.
+   */
+    public double getTotal() {
+       return purchase;
+    }; 
+
+   /**
+      Enters the payment received from the customer.
+      @param dollars the number of dollars in the payment
+      @param quarters the number of quarters in the payment
+      @param dimes the number of dimes in the payment
+      @param nickels the number of nickels in the payment
+      @param pennies the number of pennies in the payment
+   */
+   public void  enterPayment(Change payment)
+   {
+       this.payment=payment.totalValue();
+     
+   }
+   
+   /**
+      Computes the change due and resets the machine for the next customer.
+      @return the change due to the customer
+   */
+   public Change giveChange()
+   {
+      double change = payment - purchase*100;
+       int newchange=(int) Math.round(change); 
+       purchase = 0;
+      payment = 0; 
+      
+      int numD= newchange/100;
+      int numQ= (newchange-numD*100)/25;
+      int numDi=(newchange-numD*100-numQ*25)/10;
+      int numN=(newchange-numD*100-numQ*25-numDi*10)/5;
+      int numP=newchange-numD*100-numQ*25-numDi*10-numN*5;
+      return new Change(numD,numQ,numDi,numN,numP);
+ 
+     
+
+}
+}
